@@ -1,0 +1,8 @@
+faiss
+streamlit
+python-dotenv
+langchain
+PyPDF2
+chromadb
+faiss-cpu
+t 
