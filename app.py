@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_chroma import Chroma
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
@@ -10,19 +10,24 @@ from utils.load_config import LoadConfig
 from langchain_community.document_loaders import PyPDFLoader
 from PyPDF2 import PdfReader
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
 
 QA = QuestionAnswering()
 CFG = LoadConfig()
+
+load_dotenv()
 
 
 def get_pdf_text(pdf_docs):
     raw_text = ""
     for pdf_doc in pdf_docs:
-        with open(pdf_doc.name, mode="wb") as w:
-            w.write(pdf_doc.getvalue())
-        loader = PyPDFLoader(pdf_doc.name)
-        docs = loader.load_and_split()
-        raw_text += "\n\n".join(doc.page_content for doc in docs)
+        # with open(pdf_doc.name, mode="wb") as w:
+        #     w.write(pdf_doc.getvalue())
+        # loader = PyPDFLoader(pdf_doc.name)
+        # docs = loader.load_and_split()
+        loader = PdfReader(pdf_doc)
+        for page in loader.pages:
+            raw_text += "\n\n".join(page.extract_text())
         # print(raw_text)
     return raw_text
 
@@ -41,11 +46,13 @@ def format_docs(docs):
 
 def get_retriever(text_chunks):
 
-    vectorstore = Chroma.from_texts(texts=text_chunks, embedding=OpenAIEmbeddings())
-    # vectorstore = FAISS.from_texts(text_chunks, embedding=OpenAIEmbeddings())
-    # vectorstore.save_local("faiss_index")
+    # vectorstore = Chroma.from_texts(texts=text_chunks, embedding=OpenAIEmbeddings())
+    vectorstore = FAISS.from_texts(text_chunks, embedding=OpenAIEmbeddings())
+    vectorstore.save_local("faiss_index")
 
-    retriever = vectorstore.as_retriever()
+    retriever = vectorstore.as_retriever(
+        search_type="similarity", search_kwargs={"k": 2}
+    )
 
     return retriever
 
@@ -57,7 +64,7 @@ def get_rag_chain(pdf_files):
     prompt = QA.get_prompt()
     llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
     rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        {"context": retriever, "question": RunnablePassthrough()}
         | prompt
         | llm
         | StrOutputParser()
