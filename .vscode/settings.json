@@ -1,11 +1,14 @@
 {
-    "cSpell.words": [
-        "confg",
-        "FAISS",
-        "genai",
-        "generativeai",
-        "vectordb",
-        "vectorstores"
-    ]
-    
+  "cSpell.words": [
+    "Chunker",
+    "confg",
+    "docstore",
+    "FAISS",
+    "genai",
+    "generativeai",
+    "streamlit",
+    "vectordb",
+    "vectorstore",
+    "vectorstores"
+  ]
 }

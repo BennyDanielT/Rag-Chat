@@ -1,11 +1,11 @@
 # Text Splitter Configuration
 splitter_parameters:
-  chunk_size = 200
-  chunk_overlap = 20
+  chunk_size: 250
+  chunk_overlap: 50
 
 
 embedding_config:
-  model:"models/embedding-001"
+  model: "models/embedding-001"
 
 vectordb:
   faiss:

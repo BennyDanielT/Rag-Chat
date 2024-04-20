@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import yaml
 import shutil
 from pyprojroot import here
-from google.generativeai import genai
+import google.generativeai as genai
 
 
 class LoadConfig:
@@ -14,12 +14,11 @@ class LoadConfig:
     def __init__(self) -> None:
 
         with open(here("config/config.yaml")) as confg:
-            config = yaml.safe_load(confg, Loader=yaml.FullLoader)
+            config = yaml.load(confg, Loader=yaml.FullLoader)
         self.chunk_size = config["splitter_parameters"]["chunk_size"]
         self.chunk_overlap = config["splitter_parameters"]["chunk_overlap"]
         self.embedding_model = config["embedding_config"]["model"]
-        self.vectordb_directory = config["vector_db"]["faiss"]["directory"]
-        self.vectordb_index = config["vector_db"]["faiss"]["index"]
+        self.vectordb_directory = config["vectordb"]["faiss"]["directory"]
         self.system_role = config["prompt"]["system"]
         self.chat_model = config["llm"]["model"]
         self.model_temperature = config["llm"]["temperature"]
